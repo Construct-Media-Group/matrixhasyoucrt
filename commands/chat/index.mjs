@@ -7,11 +7,16 @@ async function chat() {
 
   return new Promise((resolve) => {
     let container = getScreen();
-    container.setAttribute("contenteditable", true);
+    container.setAttribute("contenteditable", false);
     container.focus();
 
+    const messageInput = document.createElement("input");
+    messageInput.id = "message-input";
+    messageInput.placeholder = "Type your message here...";
+    container.appendChild(messageInput);
+
     // Create WebSocket connection
-    const socket = new WebSocket("ws://cdeg.constructdiversitygroups.com:5543");
+    const socket = new WebSocket("ws://192.168.4.11:5543");
 
     // Connection opened
     socket.addEventListener("open", (event) => {
@@ -34,10 +39,10 @@ async function chat() {
       console.log("WebSocket error:", event);
     });
 
-    container.addEventListener("keydown", (event) => {
+    messageInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        const text = container.textContent.trim();
+        const text = messageInput.value.trim();
         if (text === "") return;
 
         // Display user message
@@ -47,18 +52,9 @@ async function chat() {
         socket.send(JSON.stringify({ text }));
 
         // Clear input
-        container.textContent = "";
+        messageInput.value = "";
       }
     });
-
-    const remove = (event) => {
-      event.preventDefault();
-      container.remove();
-      resolve();
-    };
-
-    container.addEventListener("keypress", remove);
-    container.addEventListener("click", remove);
   });
 }
 
