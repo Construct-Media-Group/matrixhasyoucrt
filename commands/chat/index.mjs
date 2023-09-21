@@ -11,7 +11,7 @@ async function chat() {
     container.focus();
 
     // Create WebSocket connection
-    const socket = new WebSocket("ws://192.168.4.11:5543");
+    const socket = new WebSocket("ws://cdeg.constructdiversitygroups.com:5543");
 
     // Connection opened
     socket.addEventListener("open", (event) => {
