@@ -1,5 +1,5 @@
 // chat.mjs
-
+import { clear } from "../../util/screen.js";
 import { prompt, type } from "../../util/io.js"; 
 
 export default async function chat() {
