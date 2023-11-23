@@ -74,7 +74,7 @@
 /*********** GENERIC STUFF *************/
 
 html {
-	font-size: 12px;
+	font-size: 8px;
 	box-sizing: border-box;
 }
 *,
@@ -165,8 +165,8 @@ pre {
 	font-family: "VT323", monospace;
 }
 #crt {
-	min-width: 80ch; /* This makes 80 monospace characters fit on the screen */
-	height: calc(80ch * 0.8);
+	min-width: 120ch; /* This makes 80 monospace characters fit on the screen */
+	height: calc(120ch * 0.8);
 	font-size: max(
 		1rem,
 		2.2vmin
