@@ -1,33 +1,24 @@
 // chat.mjs
-import { clear } from "../../util/screen.js";
-import { prompt, type } from "../../util/io.js"; 
+import { clear } from "../../util/screens.js";
+import { prompt, type } from "../../util/io.js";
+
+const API_URL = 'https://oracle.thematrixhasyou.tech/chat';
 
 export default async function chat() {
-
-  const socket = new WebSocket("ws://cdeg.constructdiversitygroups.com:5543");
-
-  socket.addEventListener('open', () => {
-    type('Connected to chat server!');
-  });
-
-  socket.addEventListener('message', e => {
-    type(`Assistant: ${e.data}`);
-  });
-
-  socket.addEventListener('close', () => {
-    type('Disconnected from server.');
-  });
-
   while(true) {
-    
     const message = await prompt('You: ');
 
     if(message === 'exit') break;
 
-    socket.send(message);
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({message})  // sessionId will be automatically included because credentials are set to 'include'
+    });
 
+    type(`Assistant: ${response}`);
   }
-
-  socket.close();
-
 }
