@@ -9,7 +9,7 @@ export default async function chat() {
     const message = await prompt('You: ');
 
     if(message === 'exit') break;
-
+      
     const response = await fetch(API_URL, {
       method: 'POST',
       credentials: 'include',

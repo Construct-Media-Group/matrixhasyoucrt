@@ -1,134 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0"
-		/>
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="style/animations.css"
-		/>
-		<link rel="stylesheet" type="text/css" href="style/style.css" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="style/switch.css"
-		/>
-		<link rel="icon" type="image/png" href="favicon.png" />
-		<title>TERMINAL v0.01-alpha</title>
-		<script src="./components/dial.js"></script>
-		<script src="https://unpkg.com/rot-js@2.1.1/dist/rot.js"></script>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clickable Zoom Image</title>
+<style>
+  .image-container {
+    position: cover;
+    width: 1980px; /* Adjust as needed */
+    margin: auto; /* Center the div on the page */
+    overflow: hidden; /* Keep the overflow content from expanding outside */
+  }
 
-		<svg style="display: none;">
-			<style>
-				.handle {
-					cursor: grab;
-				}
-			</style>
-			<!-- SVG for the radial dial component -->
-			<defs id="sample_gfx">
-				<symbol
-					id="circle-with-dot"
-					viewBox="-6 -6 12 12"
-				>
-					<circle
-						cx="0"
-						cy="0"
-						r="5.875"
-						stroke="#2e3436"
-						fill="#babdb6"
-						stroke-width="0.25"
-					/>
-					<circle
-						class="handle"
-						cx="0"
-						cy="-3.75"
-						r="0.75"
-						stroke="none"
-						fill="#2e3436"
-					/>
-				</symbol>
-			</defs>
-		</svg>
-	</head>
+  #zoomable-image {
+    width: 100%;
+    height: auto;
+    transition: transform 2s ease-out, transform-origin 0.5s ease-out; /* Smooth transition for zoom and re-positioning */
+    cursor: pointer; /* Indicates a clickable item */
+    transform-origin: 50% 50%; /* Adjust this to the center of the screen in the image */
+  }
 
-	<body class="theme-green">
-		<div id="monitor" class="off">
-			<div id="screen">
-				<div id="crt">
-					<div class="scanline"></div>
-					<div class="terminal"></div>
-				</div>
-			</div>
+  /* This class will be added via JavaScript on click */
+  .zoomed {
+    transform: scale(2); /* Adjust scale as desired for zoom level */
+    transform-origin: x937 y367 ; /* Replace with the percentage values for the screen's center */
+  }
+</style>
+</head>
+<body>
 
-			<div id="slider">
-				<label class="switch">
-					<input type="checkbox" />
-					<span class="slider"></span>
-				</label>
-			</div>
+<div class="image-container">
+  <img src="/img/console.jpg" alt="Zoomable Image" id="zoomable-image">
+</div>
 
-			<div id="controls">
-				<div id="sticky" class="post-it">
-					Admin<br />only
-				</div>
+<script>
+  var image = document.getElementById('zoomable-image');
+  image.addEventListener('click', function() {
+    // Toggle the 'zoomed' class
+    if (this.classList.contains('zoomed')) {
+      this.classList.remove('zoomed');
+    } else {
+      this.classList.add('zoomed');
+      // Redirect after a delay to allow the animation to be seen
+      setTimeout(function() {
+        window.location.href = '/terminal.html'; // Updated URL
+      }, 2000); // Redirect after 2 seconds (2000 milliseconds)
+    }
+  });
+</script>
 
-				<div id="themes">
-					<button
-						id="theme-red"
-						class="theme"
-					></button>
-					<button
-						id="theme-green"
-						class="theme active"
-					></button>
-					<button
-						id="theme-blue"
-						class="theme"
-					></button>
-				</div>
-
-				<div id="volume">
-					<span>min</span>
-
-					<div id="dial-container">
-						<x-dial
-							id="dial"
-							min="0"
-							max="0.75"
-							value="0"
-							svgsymbolid="circle-with-dot"
-						>
-						</x-dial>
-					</div>
-					<span>max</span>
-				</div>
-
-				<div id="power">
-					<button id="fullscreen">
-						⛶
-					</button>
-					<label class="rocker rocker-small">
-						<input
-							id="switch"
-							type="checkbox"
-							checked
-						/>
-						<span class="switch-left"
-							>O</span
-						>
-						<span class="switch-right"
-							>I</span
-						>
-					</label>
-				</div>
-			</div>
-		</div>
-
-		<script src="./terminal.mjs" type="module"></script>
-	</body>
+</body>
 </html>
