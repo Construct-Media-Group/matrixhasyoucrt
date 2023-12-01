@@ -3,29 +3,57 @@ import { boot } from "./screens.js";
 import { stopSpeaking } from "./speak.js";
 import pause from "./pause.js";
 
-/** Turn on the terminal */
+/**
+ * Initializes and turns on the terminal.
+ */
 async function on() {
+	// Simulate a button click to start the terminal
 	click();
+	
+	// Wait for the power to turn on
 	await power();
+	
+	// Boot the terminal system
 	boot();
-}
+  }
 
-/** Turn off the terminal */
+/**
+ * Deactivates the terminal.
+ * It simulates a click, stops any ongoing speech synthesis,
+ * and powers off the terminal.
+ */
 function off() {
+	// Simulate a click action
 	click();
+	
+	// Cease any speech synthesis
 	stopSpeaking();
+	
+	// Turn off the terminal power
 	power(false);
-}
+  }
 
-async function power(on = true) {
-	// @FIXME use a single class on the #monitor to detect on/off
+/**
+ * Toggles the power state of a UI monitor element.
+ * 
+ * @param {boolean} on - Desired power state, defaults to true (on).
+ */
+async function togglePower(on = true) {
+	// Short reference to avoid exceeding character limit
+	const monitor = document.getElementById("monitor");
+  
+	// Toggle slider class to indicate power state
 	document.querySelector("#slider").classList.toggle("on", on);
+  
+	// Set switch state opposite to power state
 	document.querySelector("#switch").checked = !on;
+  
+	// Short pause for UI effect
 	await pause(0.1);
-
-	document.getElementById("monitor").classList.toggle("turn-off", !on);
-	document.getElementById("monitor").classList.toggle("off", !on);
-	return;
-}
+  
+	// Toggle monitor classes for on/off visual state
+	monitor.classList.toggle("turn-off", !on);
+	monitor.classList.toggle("off", !on);
+  }
 
 export { power, on, off };
