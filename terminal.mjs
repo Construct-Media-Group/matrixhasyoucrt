@@ -9,6 +9,8 @@ async function onLoad() {
 	const command = urlParams.get("command");
 	const debugParam = urlParams.get("debug");
 	const fullscreen = urlParams.get("fullscreen");
+	const defaultCommand = 'chat'; // Replace 'chat' with the exact command name for the chat feature
+    const commandToRun = command || defaultCommand;
 
 	// Set up click event handlers for UI buttons
 	registerHandlers();
@@ -19,7 +21,7 @@ async function onLoad() {
 
 	// If a command is passed in the URL, execute that immediately
 	if (command || debugParam) {
-		run(command, debugParam)
+		run(commandToRun, debugParam)
 	}
 }
 
