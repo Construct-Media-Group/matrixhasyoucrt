@@ -279,31 +279,27 @@ function isPrintable(keycode) {
  * @param {HTMLElement} el - The DOM element to target.
  */
 function moveCaretToEnd(el) {
-	var range, selection;
-	if (document.createRange) {
-		range = document.createRange(); //Create a range (a range is a like the selection but invisible)
-		range.selectNodeContents(el); //Select the entire contents of the element with the range
-		range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
-		selection = window.getSelection(); //get the selection object (allows you to change selection)
-		selection.removeAllRanges(); //remove any selections already made
-		selection.addRange(range); //make the range you have just created the visible selection
-	}
-  let range, selection;
-  // Check if the document supports ranges
+  var range, selection;
   if (document.createRange) {
-    // Create a new range object
-    range = document.createRange();
-    // Select the content of the provided element
-    range.selectNodeContents(el);
-    // Collapse the range to its end point
-    range.collapse(false);
-    // Get the window's selection object
-    selection = window.getSelection();
-    // Remove any existing selections
-    selection.removeAllRanges();
-    // Add the created range as the new selection
-    selection.addRange(range);
+    range = document.createRange(); //Create a range (a range is a like the selection but invisible)
+    range.selectNodeContents(el); //Select the entire contents of the element with the range
+    range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
+    selection = window.getSelection(); //get the selection object (allows you to change selection)
+    selection.removeAllRanges(); //remove any selections already made
+    selection.addRange(range); //make the range you have just created the visible selection
   }
+  // Create a new range object
+  range = document.createRange();
+  // Select the content of the provided element
+  range.selectNodeContents(el);
+  // Collapse the range to its end point
+  range.collapse(false);
+  // Get the window's selection object
+  selection = window.getSelection();
+  // Remove any existing selections
+  selection.removeAllRanges();
+  // Add the created range as the new selection
+  selection.addRange(range);
 }
 
 /** 
@@ -311,100 +307,104 @@ function moveCaretToEnd(el) {
  * @param {boolean} pw - If true, input is treated as a password.
  */
 async function input(pw) {
-    return new Promise((resolve) => {
-        /** Handles all user input events */
-        const onKeyDown = (event) => {
-            typeSound();
-            switch(event.keyCode) {
-                case 13: // ENTER
-                    preventAndSetContentEditable(event);
-                    let enterResult = processEnter(event);
-                    resolve(enterResult);
-                    break;
-                case 38: // UP
-                    processHistoryUp(event);
-                    break;
-                case 40: // DOWN
-                    processHistoryDown(event);
-                    break;
-                case 8: // BACKSPACE
-                    preventDefaultOnSingleChar(event);
-                    break;
-                default:
-                    if (isPrintable(event.keyCode) && !event.ctrlKey) {
-                        preventAndDisplayChar(event, pw);
-                    }
-            }
-        };
+	return new Promise((resolve) => {
+		/** Handles all user input events */
+		const onKeyDown = (event) => {
+			typeSound();
+			switch(event.keyCode) {
+				case 13: // ENTER
+					preventAndSetContentEditable(event);
+					let enterResult = processEnter(event);
+					resolve(enterResult);
+					break;
+				case 38: // UP
+					processHistoryUp(event);
+					break;
+				case 40: // DOWN
+					processHistoryDown(event);
+					break;
+				case 8: // BACKSPACE
+					preventDefaultOnSingleChar(event);
+					break;
+				default:
+					if (isPrintable(event.keyCode) && !event.ctrlKey) {
+						preventAndDisplayChar(event, pw);
+					}
+			}
+		};
 
-        // Add input to terminal and focus
-        let terminal = document.querySelector(".terminal");
-        let inputEl = createInput(pw);
-        terminal.appendChild(inputEl);
-        inputEl.focus();
-    });
-}
+		const preventAndSetContentEditable = (event) => {
+			event.preventDefault();
+			event.target.setAttribute("contenteditable", false);
+		};
 
-function preventAndSetContentEditable(event) {
-    event.preventDefault();
-    event.target.setAttribute("contenteditable", false);
-}
+		const processEnter = (event) => {
+			let result = cleanInput(event.target.textContent);
+			addToHistory(result);
+			return result;
+		};
 
-function processEnter(event) {
-    let result = cleanInput(event.target.textContent);
-    addToHistory(result);
-    return result;
-}
+		const processHistoryUp = (event) => {
+			if (historyIndex === -1) tmp = event.target.textContent;
+			historyIndex = Math.min(prev.length - 1, historyIndex + 1);
+			event.target.textContent = prev[historyIndex];
+		};
 
-function processHistoryUp(event) {
-    if (historyIndex === -1) tmp = event.target.textContent;
-    historyIndex = Math.min(prev.length - 1, historyIndex + 1);
-    event.target.textContent = prev[historyIndex];
-}
+		const processHistoryDown = (event) => {
+			historyIndex = Math.max(-1, historyIndex - 1);
+			let text = prev[historyIndex] || tmp;
+			event.target.textContent = text;
+		};
 
-function processHistoryDown(event) {
-    historyIndex = Math.max(-1, historyIndex - 1);
-    let text = prev[historyIndex] || tmp;
-    event.target.textContent = text;
-}
+		const preventDefaultOnSingleChar = (event) => {
+			if (event.target.textContent.length === 1) {
+				event.preventDefault();
+				event.target.innerHTML = "";
+			}
+		};
 
-function preventDefaultOnSingleChar(event) {
-    if (event.target.textContent.length === 1) {
-        event.preventDefault();
-        event.target.innerHTML = "";
-    }
-}
+		const preventAndDisplayChar = (event, pw) => {
+			event.preventDefault();
+			let span = document.createElement("span");
+			span.textContent = getCharFromKeyCode(event.keyCode);
+			span.classList.add("char");
+			event.target.appendChild(span);
 
-function preventAndDisplayChar(event, pw) {
-    event.preventDefault();
-    let span = document.createElement("span");
-    span.textContent = getCharFromKeyCode(event.keyCode);
-    span.classList.add("char");
-    event.target.appendChild(span);
+			if (pw) {
+				showAsterisksInPwField(event.target);
+			}
+			moveCaretToEnd(event.target);
+		};
 
-    if (pw) {
-        showAsterisksInPwField(event.target);
-    }
-    moveCaretToEnd(event.target);
-}
+		const getCharFromKeyCode = (keyCode) => {
+			let chrCode = keyCode - 48 * Math.floor(keyCode / 48);
+			return String.fromCharCode(96 <= keyCode ? chrCode : keyCode);
+		};
 
-function getCharFromKeyCode(keyCode) {
-    let chrCode = keyCode - 48 * Math.floor(keyCode / 48);
-    return String.fromCharCode(96 <= keyCode ? chrCode : keyCode);
-}
+		const showAsterisksInPwField = (target) => {
+			let length = target.textContent.length;
+			target.setAttribute("data-pw", Array(length).fill("*").join(""));
+		};
 
-function showAsterisksInPwField(target) {
-    let length = target.textContent.length;
-    target.setAttribute("data-pw", Array(length).fill("*").join(""));
-}
+		const createInput = (pw) => {
+			let input = document.createElement("span");
+			input.setAttribute("id", "input");
+			input.setAttribute("contenteditable", true);
 
-function createInput(pw) {
-    let input = document.createElement("span");
-    input.setAttribute("id", "input");
-    input.setAttribute("contenteditable", true);
-    input.classList.add(pw ? "password" : "");
-    input.addEventListener("keydown", onKeyDown);
-    return input;
+			if (pw) {
+				input.classList.add("password");
+			}
+
+			input.addEventListener("keydown", onKeyDown);
+			return input;
+		};
+
+		// Add input to terminal and focus
+		let terminal = document.querySelector(".terminal");
+		let inputEl = createInput(pw);
+		terminal.appendChild(inputEl);
+		inputEl.focus();
+	});
 }
 
 /**

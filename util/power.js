@@ -11,7 +11,7 @@ async function on() {
 	click();
 	
 	// Wait for the power to turn on
-	await power();
+	await togglePower();
 	
 	// Boot the terminal system
 	boot();
@@ -30,7 +30,7 @@ function off() {
 	stopSpeaking();
 	
 	// Turn off the terminal power
-	power(false);
+	togglePower(false);
   }
 
 /**
@@ -56,4 +56,4 @@ async function togglePower(on = true) {
 	monitor.classList.toggle("off", !on);
   }
 
-export { power, on, off };
+export { togglePower as power, on, off };

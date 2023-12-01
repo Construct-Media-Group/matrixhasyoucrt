@@ -46,7 +46,10 @@ async function boot() {
 	});
 
 	await pause();
-	return login();
+	clear();
+	postBootWelcomeMessage();
+	await new Promise(resolve => setTimeout(resolve, 6000));
+	return main();
 }
 
 /**
@@ -75,7 +78,12 @@ async function login() {
 		return login();
 	}
 }
+async function postBootWelcomeMessage() {
+	await type(["Welcome to the Construct"], {lineWait: 500});
+	await type(["In order to interact with this console please type out one of the following commands:"], {lineWait: 500});
+	await type(["chat - Chat with the Oracle themself, help - Get an extended list of commands"], {lineWait: 500});
 
+}
 /**
  * Main input terminal, recursively calls itself.
  * 
@@ -116,19 +124,13 @@ function addClasses(el, ...cls) {
 	el.classList.add(...list);
   }
 
-/**
- * Add multiple classes to an element.
- *
- * @param {HTMLElement} el - The element to which the classes will be added.
- * @param {...string} cls - The classes to be added.
- */
-function addClasses(el, ...cls) {
-	// Filter out any falsy values from the classes array
-	let list = [...cls].filter(Boolean);
-  
-	// Add the filtered classes to the element's class list
-	el.classList.add(...list);
-  }
+  function getScreen(...cls) {
+	let div = document.createElement("div");
+	addClasses(div, "fullscreen", ...cls);
+	document.querySelector("#crt").appendChild(div);
+	return div;
+}
+
 
 /**
  * Toggles the fullscreen mode of the document body.
@@ -262,7 +264,7 @@ export {
 	clear,
 	getScreen,
 	toggleFullscreen,
-	div,
+	createDiv as div,
 	el,
 	loadTemplates,
 	addTemplate,

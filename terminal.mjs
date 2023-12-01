@@ -4,23 +4,23 @@ import { toggleFullscreen } from "./util/screens.js";
 import { registerHandlers } from "./util/ui.mjs";
 
 async function onLoad() {
-	// Check for query parameters in the URL, e.g. ?command=help&fullscreen=1
-	const urlParams = new URLSearchParams(window.location.search);
-	const command = urlParams.get("command");
-	const debugParam = urlParams.get("debug");
-	const fullscreen = urlParams.get("fullscreen");
+    // Check for query parameters in the URL, e.g. ?command=help&fullscreen=1
+    const urlParams = new URLSearchParams(window.location.search);
+    const command = urlParams.get("command");
+    const debugParam = urlParams.get("debug");
+    const fullscreen = urlParams.get("fullscreen");
 
-	// Set up click event handlers for UI buttons
-	registerHandlers();
+    // Set up click event handlers for UI buttons
+    registerHandlers();
 
-	if(fullscreen) {
-		toggleFullscreen(true);
-	}
+    if(fullscreen) {
+        toggleFullscreen(true);
+    }
 
-	// If a command is passed in the URL, execute that immediately
-	if (command || debugParam) {
-		run(command, debugParam)
-	}
+    // Execute the command or debug parameter if provided
+    if (command || debugParam) {
+        run(command, debugParam);
+    }
 }
 
 async function run(command, debug) {
