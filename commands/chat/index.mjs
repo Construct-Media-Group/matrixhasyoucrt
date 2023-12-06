@@ -18,7 +18,13 @@ export default async function chat() {
       },
       body: JSON.stringify({message})  // sessionId will be automatically included because credentials are set to 'include'
     });
+    // Parse the JSON response body
+    const data = await response.json();
 
-    type(`Assistant: ${response}`);
+    // Extract the 'message' field from the JSON response
+    const assistantResponse = data.message;
+
+    console.log({assistantResponse});
+    type(`Assistant: ${assistantResponse}`);  
   }
-}
+} 
