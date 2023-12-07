@@ -69,7 +69,7 @@ async function hackerman() {
 			}
 		};
 
-		typer.classList.add("typer", "active");
+		//typer.classList.add("typer", "active");
 		typer.setAttribute("contenteditable", true);
 		typer.addEventListener("keydown", onKeyDown);
 		typer.focus();

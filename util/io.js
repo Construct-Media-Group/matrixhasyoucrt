@@ -9,81 +9,132 @@ let prev = getHistory();
 let historyIndex = -1;
 let tmp = "";
 
+/**
+ * Retrieves the command history from the local storage.
+ * @returns {Array} The command history.
+ */
 function getHistory() {
+	// Retrieve the command history from local storage
 	let storage = localStorage.getItem("commandHistory");
+  
 	let prev;
+  
 	if (storage) {
-		try {
-			let json = JSON.parse(storage);
-			prev = Array.isArray(json) ? json : [];
-		} catch (e) {
-			prev = [];
-		}
-	} else {
+	  try {
+		// Parse the stored data as JSON
+		let json = JSON.parse(storage);
+  
+		// If the parsed data is an array, assign it to prev, otherwise assign an empty array
+		prev = Array.isArray(json) ? json : [];
+	  } catch (e) {
+		// If there is an error parsing the JSON, assign an empty array to prev
 		prev = [];
+	  }
+	} else {
+	  // If there is no stored data, assign an empty array to prev
+	  prev = [];
 	}
+  
+	// Return the command history
 	return prev;
-}
+  }
 
+
+/**
+ * Add command to history.
+ *
+ * @param {string} cmd - The command to be added to history.
+ */
 function addToHistory(cmd) {
-	prev = [cmd, ...prev];
-	historyIndex = -1;
-	tmp = "";
+  // Add command to the beginning of the history array
+  prev = [cmd, ...prev];
 
-	try {
-		localStorage.setItem("commandHistory", JSON.stringify(prev));
-	} catch (e) {}
+  // Reset history index
+  historyIndex = -1;
+
+  // Clear temporary input
+  tmp = "";
+
+  try {
+    // Store updated command history in local storage
+    localStorage.setItem("commandHistory", JSON.stringify(prev));
+  } catch (e) {
+    // Ignore any errors that occur during storage
+  }
 }
 
 /**
- * Convert a character that needs to be typed into something that can be shown on the screen.
- * Newlines becomes <br>
- * Tabs become three spaces.
- * Spaces become &nbsp;
- * */
+ * Converts a character that needs to be typed into something that can be shown on the screen.
+ * Newlines become <br>,
+ * Tabs become three spaces, and
+ * Spaces become &nbsp;.
+ * 
+ * @param {string} char - The character to convert.
+ * @returns {HTMLElement} - The converted character as an HTML element.
+ */
 function getChar(char) {
 	let result;
+  
+	// Check if the input is a string
 	if (typeof char === "string") {
-		if (char === "\n") {
-			result = document.createElement("br");
-		} else if (char === "\t") {
-			let tab = document.createElement("span");
-			tab.innerHTML = "&nbsp;&nbsp;&nbsp;";
-			result = tab;
-		} else if (char === " ") {
-			let space = document.createElement("span");
-			space.innerHTML = "&nbsp;";
-			space.classList.add("char");
-			result = space;
-		} else {
-			let span = document.createElement("span");
-			span.classList.add("char");
-			span.textContent = char;
-			result = span;
-		}
+	  // Check if the character is a newline
+	  if (char === "\n") {
+		result = document.createElement("br");
+	  }
+	  // Check if the character is a tab
+	  else if (char === "\t") {
+		let tab = document.createElement("span");
+		tab.innerHTML = "&nbsp;&nbsp;&nbsp;";
+		result = tab;
+	  }
+	  // Check if the character is a space
+	  else if (char === " ") {
+		let space = document.createElement("span");
+		space.innerHTML = "&nbsp;";
+		space.classList.add("char");
+		result = space;
+	  }
+	  // If the character is neither a newline, tab, nor space, create a span element and set the text content to the character
+	  else {
+		let span = document.createElement("span");
+		span.classList.add("char");
+		span.textContent = char;
+		result = span;
+	  }
 	}
+  
 	return result;
-}
+  }
 
 /**
- * Types the given text on the screen
- * @param {String|Array<String>} text Text to type
- * @param {Object} options Typer config
- * @param {Number} options.wait Time (ms) to wait between characters.
- * @param {Number} options.lineWait If text is an array of strings, it will wait this amount (ms) between lines
- * @param {Number} options.finalWait Time (ms) to wait when finished.
- * @param {String} options.typerClass Class to add to the typing container, in order to style is with CSS
- * @param {Boolean} options.useContainer If true, types text into the container element (3rd parameter). If false, creates a new div
- * @param {Boolean} options.stopBlinking Stop blinking when typing is done
- * @param {Boolean} options.processChars Whether to preprocess spaces, tabs and newlines to &nbsp; (3x&nbsp;) and <br>
- * @param {Boolean} options.clearContainer Clear container before typing
- * @param {Element} container DOM element where text will be typed
+ * Simulates the typing of text within a given container element on the web page.
+ * 
+ * This function can handle both strings and arrays of strings, simulating the typing of 
+ * text character by character, including configurable delays between characters and lines.
+ * When given an array of strings, it types each string on a new line, waiting for a 
+ * specified amount of time before typing the next line. It can also clear the container before typing,
+ * add a CSS class to the container, and stop blinking cursor effect after typing is completed.
+ * 
+ * @param {String|Array<String>} text - The text to be typed. Can be a single string or an array of strings.
+ * @param {Object} [options] - Configuration options for the typing effect.
+ * @param {Number} [options.wait=30] - Time in milliseconds to wait between typing each character.
+ * @param {Number} [options.initialWait=1000] - Time in milliseconds to wait before starting to type.
+ * @param {Number} [options.lineWait=100] - Time in milliseconds to wait between typing each line (when text is an array).
+ * @param {Number} [options.finalWait=500] - Time in milliseconds to wait after finishing typing all text.
+ * @param {String} [options.typerClass=""] - CSS class to add to the typing container for styling purposes.
+ * @param {Boolean} [options.useContainer=false] - Whether to type inside the given container element or to create a new div for typing.
+ * @param {Boolean} [options.stopBlinking=true] - Whether to stop the blinking cursor effect after typing is finished.
+ * @param {Boolean} [options.processChars=true] - Whether to preprocess spaces, tabs, and newlines to corresponding HTML entities.
+ * @param {Boolean} [options.clearContainer=false] - Whether to clear the container before starting to type.
+ * @param {Element} [container=document.querySelector(".terminal")] - The DOM element where the text will be typed.
+ * @returns {Promise<void>} A promise that resolves when typing is complete.
  */
 async function type(
 	text,
 	options = {},
 	container = document.querySelector(".terminal")
 ) {
+	console.debug(text);
 	if (!text) return Promise.resolve();
 
 	let {
@@ -91,7 +142,7 @@ async function type(
 		initialWait = 1000,
 		finalWait = 500,
 		lineWait = 100,
-		typerClass = "",
+		typerClass = "typer",
 		useContainer = false,
 		stopBlinking = true,
 		processChars = true,
@@ -198,218 +249,295 @@ async function type(
 	});
 }
 
+/**
+ * Check if a keycode corresponds to a printable character.
+ * This includes numbers, letters, spacebar, numpad, and some symbol keys.
+ * 
+ * @param {number} keycode - The keycode to check.
+ * @returns {boolean} True if the keycode is for a printable char, else false.
+ */
 function isPrintable(keycode) {
-	return (
-		(keycode > 47 && keycode < 58) || // number keys
-		keycode === 32 || // spacebar & return key(s) (if you want to allow carriage returns)
-		(keycode > 64 && keycode < 91) || // letter keys
-		(keycode > 95 && keycode < 112) || // numpad keys
-		(keycode > 185 && keycode < 193) || // ;=,-./` (in order)
-		(keycode > 218 && keycode < 223)
-	);
+	// Number keys
+	const isNumber = keycode > 47 && keycode < 58;
+	// Spacebar
+	const isSpacebar = keycode === 32;
+	// Letter keys
+	const isLetter = keycode > 64 && keycode < 91;
+	// Numpad keys
+	const isNumpad = keycode > 95 && keycode < 112;
+	// Symbol keys: ;=,-./`
+	const isSymbol1 = keycode > 185 && keycode < 193;
+	// Symbol keys: [\]'
+	const isSymbol2 = keycode > 218 && keycode < 223;
+
+	return isNumber || isSpacebar || isLetter ||
+	       isNumpad || isSymbol1 || isSymbol2;
 }
 
+/**
+ * Moves the caret (cursor) to the end of the content in the
+ * specified element.
+ * @param {HTMLElement} el - The DOM element to target.
+ */
 function moveCaretToEnd(el) {
-	var range, selection;
-	if (document.createRange) {
-		range = document.createRange(); //Create a range (a range is a like the selection but invisible)
-		range.selectNodeContents(el); //Select the entire contents of the element with the range
-		range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
-		selection = window.getSelection(); //get the selection object (allows you to change selection)
-		selection.removeAllRanges(); //remove any selections already made
-		selection.addRange(range); //make the range you have just created the visible selection
-	}
+  var range, selection;
+  if (document.createRange) {
+    range = document.createRange(); //Create a range (a range is a like the selection but invisible)
+    range.selectNodeContents(el); //Select the entire contents of the element with the range
+    range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
+    selection = window.getSelection(); //get the selection object (allows you to change selection)
+    selection.removeAllRanges(); //remove any selections already made
+    selection.addRange(range); //make the range you have just created the visible selection
+  }
+  // Create a new range object
+  range = document.createRange();
+  // Select the content of the provided element
+  range.selectNodeContents(el);
+  // Collapse the range to its end point
+  range.collapse(false);
+  // Get the window's selection object
+  selection = window.getSelection();
+  // Remove any existing selections
+  selection.removeAllRanges();
+  // Add the created range as the new selection
+  selection.addRange(range);
 }
 
-/** Shows an input field, returns a resolved promise with the typed text on <enter> */
+/** 
+ * Shows an input field and returns a promise with the text on <enter>.
+ * @param {boolean} pw - If true, input is treated as a password.
+ */
 async function input(pw) {
 	return new Promise((resolve) => {
-		// This handles all user input
+		/** Handles all user input events */
 		const onKeyDown = (event) => {
 			typeSound();
-			// ENTER
-			if (event.keyCode === 13) {
-				event.preventDefault();
-				event.target.setAttribute(
-					"contenteditable",
-					false
-				);
-				let result = cleanInput(
-					event.target.textContent
-				);
-
-				// history
-				addToHistory(result);
-				resolve(result);
-			}
-			// UP
-			else if (event.keyCode === 38) {
-				if (historyIndex === -1)
-					tmp = event.target.textContent;
-				historyIndex = Math.min(
-					prev.length - 1,
-					historyIndex + 1
-				);
-				let text = prev[historyIndex];
-				event.target.textContent = text;
-			}
-			// DOWN
-			else if (event.keyCode === 40) {
-				historyIndex = Math.max(-1, historyIndex - 1);
-				let text = prev[historyIndex] || tmp;
-				event.target.textContent = text;
-			}
-			// BACKSPACE
-			else if (event.keyCode === 8) {
-				// Prevent inserting a <br> when removing the last character
-				if (event.target.textContent.length === 1) {
-					event.preventDefault();
-					event.target.innerHTML = "";
-				}
-			}
-			// Check if character can be shown as output (skip if CTRL is pressed)
-			else if (isPrintable(event.keyCode) && !event.ctrlKey) {
-				event.preventDefault();
-				// Wrap the character in a span
-				let span = document.createElement("span");
-
-				let keyCode = event.keyCode;
-				let chrCode =
-					keyCode - 48 * Math.floor(keyCode / 48);
-				let chr = String.fromCharCode(
-					96 <= keyCode ? chrCode : keyCode
-				);
-				// Add span to the input
-				span.classList.add("char");
-				span.textContent = chr;
-				event.target.appendChild(span);
-
-				// For password field, fill the data-pw attr with asterisks
-				// which will be shown using CSS
-				if (pw) {
-					let length =
-						event.target.textContent.length;
-					event.target.setAttribute(
-						"data-pw",
-						Array(length).fill("*").join("")
-					);
-				}
-				moveCaretToEnd(event.target);
+			switch(event.keyCode) {
+				case 13: // ENTER
+					preventAndSetContentEditable(event);
+					let enterResult = processEnter(event);
+					resolve(enterResult);
+					break;
+				case 38: // UP
+					processHistoryUp(event);
+					break;
+				case 40: // DOWN
+					processHistoryDown(event);
+					break;
+				case 8: // BACKSPACE
+					preventDefaultOnSingleChar(event);
+					break;
+				default:
+					if (isPrintable(event.keyCode) && !event.ctrlKey) {
+						preventAndDisplayChar(event, pw);
+					}
 			}
 		};
 
-		// Add input to terminal
+		const preventAndSetContentEditable = (event) => {
+			event.preventDefault();
+			event.target.setAttribute("contenteditable", false);
+		};
+
+		const processEnter = (event) => {
+			let result = cleanInput(event.target.textContent);
+			addToHistory(result);
+			return result;
+		};
+
+		const processHistoryUp = (event) => {
+			if (historyIndex === -1) tmp = event.target.textContent;
+			historyIndex = Math.min(prev.length - 1, historyIndex + 1);
+			event.target.textContent = prev[historyIndex];
+		};
+
+		const processHistoryDown = (event) => {
+			historyIndex = Math.max(-1, historyIndex - 1);
+			let text = prev[historyIndex] || tmp;
+			event.target.textContent = text;
+		};
+
+		const preventDefaultOnSingleChar = (event) => {
+			if (event.target.textContent.length === 1) {
+				event.preventDefault();
+				event.target.innerHTML = "";
+			}
+		};
+
+		const preventAndDisplayChar = (event, pw) => {
+			event.preventDefault();
+			let span = document.createElement("span");
+			span.textContent = getCharFromKeyCode(event.keyCode);
+			span.classList.add("char");
+			event.target.appendChild(span);
+
+			if (pw) {
+				showAsterisksInPwField(event.target);
+			}
+			moveCaretToEnd(event.target);
+		};
+
+		const getCharFromKeyCode = (keyCode) => {
+			let chrCode = keyCode - 48 * Math.floor(keyCode / 48);
+			return String.fromCharCode(96 <= keyCode ? chrCode : keyCode);
+		};
+
+		const showAsterisksInPwField = (target) => {
+			let length = target.textContent.length;
+			target.setAttribute("data-pw", Array(length).fill("*").join(""));
+		};
+
+		const createInput = (pw) => {
+			let input = document.createElement("span");
+			input.setAttribute("id", "input");
+			input.setAttribute("contenteditable", true);
+
+			if (pw) {
+				input.classList.add("password");
+			}
+
+			input.addEventListener("keydown", onKeyDown);
+			return input;
+		};
+
+		// Add input to terminal and focus
 		let terminal = document.querySelector(".terminal");
-		let input = document.createElement("span");
-		input.setAttribute("id", "input");
-		if (pw) {
-			input.classList.add("password");
-		}
-		input.setAttribute("contenteditable", true);
-		input.addEventListener("keydown", onKeyDown);
-		terminal.appendChild(input);
-		input.focus();
+		let inputEl = createInput(pw);
+		terminal.appendChild(inputEl);
+		inputEl.focus();
 	});
 }
 
-// Processes the user input and executes a command
+/**
+ * Asynchronously processes user input and executes a command.
+ * @param {string} input - The raw input from the user.
+ */
 async function parse(input) {
+	// Clean and validate the input
 	input = cleanInput(input);
-
-	if (!input) {
-		return;
-	}
-	// Only allow words, separated by space
-	let matches = String(input).match(/^(\w+)(?:\s((?:\w+(?:\s\w+)*)))?$/);
-
-	if (!matches) {
-		throw new Error("Invalid command");
-	}
-	let command = matches[1];
-	let args = matches[2];
-
+	if (!input) return;
+  
+	// Match command and arguments from the input
+	let matches = String(input)
+	  .match(/^(\w+)(?:\s((?:\w+(?:\s\w+)*)))?$/);
+	if (!matches) throw new Error("Invalid command");
+  
+	// Extract command and arguments
+	let [_, command, args] = matches;
+  
+	// List of prohibited words
 	let naughty = ["fuck", "shit", "die", "ass", "cunt"];
-	if (naughty.some((word) => command.includes(word))) {
-		throw new Error("Please don't use that language");
+	if (naughty.some(word => command.includes(word))) {
+	  throw new Error("Please don't use that language");
 	}
-
-	let module;
-
-	// Try to import the command function
+  
+	let module; // Holds the imported command module
+  
+	// Attempt to import the command module
 	try {
-		module = await import(`../commands/${command}/index.mjs`);
+	  module = await import(`../commands/${command}/index.mjs`);
 	} catch (e) {
-		console.error(e);
-		// Kinda abusing TypeError to check if the import failed
-		if (e instanceof TypeError) {
-			e.message = `Unknown command: ${command}`;
-		}
-		// E.g. syntax error
-		else {
-			e.message = "Error while executing command";
-		}
-		throw e;
+	  console.error(e);
+	  e.message = e instanceof TypeError
+		? `Unknown command: ${command}`
+		: "Error while executing command";
+	  throw e;
 	}
-
-	module.stylesheets?.forEach((name) => {
-		addStylesheet(`commands/${command}/${name}.css`);
+  
+	// Load stylesheets if any
+	module.stylesheets?.forEach(name =>
+	  addStylesheet(`commands/${command}/${name}.css`));
+  
+	// Load HTML templates if any
+	module.templates?.forEach(async name => {
+	  await loadTemplates(`commands/${command}/${name}.html`);
 	});
-
-	// Try to import and parse any HTML templates that the command module exports
-	module.templates?.forEach(async (name) => {
-		await loadTemplates(`commands/${command}/${name}.html`);
-	});
-
-	// Show any output if the command exports any
+  
+	// Output any command output
 	await type(module.output);
 	await pause();
-
-	// Execute the command (default export)
+  
+	// Execute the command
 	await module.default?.(args);
+  }
 
-	return;
-}
-
+/**
+ * Converts the input string to lowercase and trims whitespace.
+ * @param {string} input - The string to be cleaned.
+ * @return {string} The cleaned string.
+ */
 function cleanInput(input) {
-	return input.toLowerCase().trim();
-}
+	// Convert to lowercase
+	const lowerCased = input.toLowerCase();
+	// Trim whitespace from both ends of the string
+	const trimmed = lowerCased.trim();
+	// Return the cleaned string
+	return trimmed;
+  }
 
-function scroll(el = document.querySelector(".terminal")) {
+/**
+ * Scrolls the element to its bottom.
+ * @param {Element} el - The DOM element to scroll. 
+ * Defaults to the first element with class 'terminal'.
+ */
+function scroll(el) {
+	// If no element is provided, select the .terminal element
+	el = el || document.querySelector('.terminal');
+	// Set the scrollTop to the scrollHeight to scroll to bottom
 	el.scrollTop = el.scrollHeight;
-}
+  }
 
-/** Types the given text and asks input */
+/**
+ * Asynchronously prompts the user by typing a message and waiting for input.
+ * @param {string} text - The text to type out for the prompt.
+ * @param {boolean} pw - Indicates if the input is a password.
+ * @returns {Promise<string>} The user's input response.
+ */
 async function prompt(text, pw = false) {
+	// Type out the prompt message
 	await type(text);
+	// Return the user input, handling passwords if needed
 	return input(pw);
-}
+  }
 
-/** Sets a global event listeners and returns when a key is hit */
+/**
+ * Waits for a key press or a click event before resolving.
+ * @returns {Promise<void>} A promise that resolves when a key is pressed or a click event occurs.
+ */
 async function waitForKey() {
+	// Helper function to resolve the promise and clean up event listeners
+	const handleEvent = () => {
+	  // Remove event listeners to avoid memory leaks
+	  document.removeEventListener('keyup', handleEvent);
+	  document.removeEventListener('click', handleEvent);
+	  // Resolve the promise
+	  resolve();
+	};
+  
 	return new Promise((resolve) => {
-		const handle = () => {
-			document.removeEventListener("keyup", handle);
-			document.removeEventListener("click", handle);
-			resolve();
-		};
-		document.addEventListener("keyup", handle);
-		document.addEventListener("click", handle);
+	  // Set up event listeners for keyup and click events
+	  document.addEventListener('keyup', handleEvent);
+	  document.addEventListener('click', handleEvent);
 	});
-}
+  }
 
+/**
+ * This function adds a new stylesheet to the document's head.
+ * @param {string} href - The URL of the stylesheet to be added.
+ */
 function addStylesheet(href) {
-	let head = document.getElementsByTagName("HEAD")[0];
-
-	// Create new link Element
-	let link = document.createElement("link");
-
-	// set the attributes for link element
-	link.rel = "stylesheet";
-	link.type = "text/css";
-	link.href = href;
-
-	// Append link element to HTML head
+	// Get the first head element from the document
+	let head = document.head;
+  
+	// Create a link element for the stylesheet
+	let link = document.createElement('link');
+  
+	// Set the link element's attributes
+	link.setAttribute('rel', 'stylesheet');
+	link.setAttribute('type', 'text/css');
+	link.setAttribute('href', href);
+  
+	// Append the link element to the head
 	head.appendChild(link);
-}
-
+  }
 export { prompt, input, cleanInput, type, parse, scroll, waitForKey };

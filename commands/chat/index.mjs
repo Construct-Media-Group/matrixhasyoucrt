@@ -9,30 +9,35 @@ const availableCommands = ['logout', 'help', 'joke', /* other commands */];
 
 export default async function chat() {
   while(true) {
-    const input = await prompt('You: ');
+    const message = await prompt('You: ');
+    console.log(`Simulant: ${message}`)
+    if(message === 'exit') break;
 
-    if(input === 'exit') break;
+    type('WAITING...');
 
-    // Check if the input exactly matches a command
-    if (availableCommands.includes(input)) {
-      try {
-        await parse(input); // Execute the command
-      } catch (error) {
-        type(`Error: ${error.message}`);
-      }
-    } else {
-      // Handle as a normal chat message
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({message: input})
-      });
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({message: message})  // sessionId will be automatically included because credentials are set to 'include'
+    });
+    // Parse the JSON response body
 
-      const responseData = await response.json(); // Assuming the response is JSON
-      type(`Assistant: ${responseData.message}`); // Replace 'message' with the actual property name of the response message
-    }
+    const responseData = await response.json();
+const assistantResponse = JSON.stringify(responseData.message)
+  .replace(/\\n/g, ' ')
+  .replace(/\n/g, ' ')
+  .replace(/\\'/g, "'")
+  .replace(/\\"/g, '"')
+  .replace(/\\&/g, '&')
+  .replace(/\\r/g, '\r')
+  .replace(/\\t/g, '\t')
+  .replace(/\\b/g, '\b')
+  .replace(/\\f/g, '\f');
+
+    console.log(`Oracle: ${assistantResponse}`);
+    await type(`Assistant: ${assistantResponse}`);  
   }
-}
+} 
