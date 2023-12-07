@@ -3,18 +3,27 @@ import { boot } from "./screens.js";
 import { stopSpeaking } from "./speak.js";
 import pause from "./pause.js";
 
+let terminalIsOn = false; 	
+
 /**
  * Initializes and turns on the terminal.
  */
 async function on() {
+	if (terminalIsOn) {
+	  console.log("Terminal is already on.");
+	  return;
+	}
+  
 	// Simulate a button click to start the terminal
 	click();
-	
+  
 	// Wait for the power to turn on
 	await togglePower();
-	
+  
 	// Boot the terminal system
 	boot();
+  
+	terminalIsOn = true;
   }
 
 /**
@@ -23,14 +32,21 @@ async function on() {
  * and powers off the terminal.
  */
 function off() {
+	if (!terminalIsOn) {
+	  console.log("Terminal is already off.");
+	  return;
+	}
+  
 	// Simulate a click action
 	click();
-	
+  
 	// Cease any speech synthesis
 	stopSpeaking();
-	
+  
 	// Turn off the terminal power
 	togglePower(false);
+  
+	terminalIsOn = false;
   }
 
 /**
