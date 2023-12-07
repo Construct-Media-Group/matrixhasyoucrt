@@ -5,51 +5,57 @@ import say from "./speak.js";
 
 const USER = "admin";
 const PW = "admin";
+let isBooting = false
+
+const BOOT_MESSAGE = [
+	'Welcome The Construct Terminal',
+	'> SET TERMINAL/BOOT',
+	'OK.',
+	' ',
+	'> SET TERMINAL/LOGON',
+	'Authenticating User...',
+	'Authentication Successful',
+	' ',
+	'Starting Session, Please stand by...'
+]
+
+const POST_BOOT_MESSAGE = [
+	'Welcome to The Construct Terminal',
+	'=================================',
+	' ',
+	'In order to interact with this terminal please type out one of the following commands:',
+	' ',
+	'CHAT : Consult with the Oracle',
+	'HELP : Get an extended list of commands',
+	' ',
+]
 
 /**
  * Displays a boot screen and performs user authentication check.
  * @returns {Promise<void>}
  */
 async function boot() {
-	clear();
+	// Using async/await
+	await new Promise(resolve => setTimeout(resolve, 200));
+	if (isBooting == false) {
+		isBooting = true
+		clear();
 
-	// Display welcome message
-	await type("Welcome Construct Sound terminal", { initialWait: 3000 });
+		await type(BOOT_MESSAGE, { initialWait: 2500, lineWait: 400,
+			finalWait: 250 });
 
-	// Display loading animation
-	await type(["> SET TERMINAL/BOOT", "Loading........................"], {
-		lineWait: 1000
-	});
-
-	// Display loading progress animation
-	await type(
-		[
-			".....",
-			"Please wait........",
-			"..........",
-			"...",
-			".",
-			".",
-			".",
-			".",
-			"."
-		],
-		{ lineWait: 250 }
-	);
-
-	await type(["OK.", " "]);
-
-	// Display user authentication check message
-	await type(["> SET TERMINAL/LOGON", "USER AUTHENTICATION CHECK"], {
-		lineWait: 1000,
-		finalWait: 3000
-	});
-
-	await pause();
-	clear();
-	postBootWelcomeMessage();
-	await new Promise(resolve => setTimeout(resolve, 6000));
-	return main();
+		await pause(2);
+		clear();
+		await type(POST_BOOT_MESSAGE, { initialWait: 1000, lineWait: 100,
+			finalWait: 250 });
+		//await new Promise(resolve => setTimeout(resolve, 6000));
+		isBooting = false;
+		return main();
+		}
+	else {
+		return;
+	}
+	
 }
 
 /**
@@ -78,12 +84,7 @@ async function login() {
 		return login();
 	}
 }
-async function postBootWelcomeMessage() {
-	await type(["Welcome to the Construct"], {lineWait: 500});
-	await type(["In order to interact with this console please type out one of the following commands:"], {lineWait: 500});
-	await type(["chat - Chat with the Oracle themself, help - Get an extended list of commands"], {lineWait: 500});
 
-}
 /**
  * Main input terminal, recursively calls itself.
  * 
@@ -251,10 +252,14 @@ function createDiv(container, cls) {
 	container.appendChild(divElement);
 	return divElement;
   }
-  function clear(screen = document.querySelector(".terminal")) {
-	console.log("Clearing screen...");
-	screen.innerHTML = "";
-	console.log("Screen cleared.");
+
+function clear(className = 'terminal') {
+	console.debug("Clearing screen...");
+	const divElements = document.getElementsByClassName(className);
+	for (let idx = 0; idx < divElements.length; idx++) {
+		divElements[idx].innerHTML = '';
+	}
+	console.debug("Screen cleared.");
 }
 
 export {
