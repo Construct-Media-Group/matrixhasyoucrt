@@ -3,34 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clickable Zoom Image</title>
+<title>BTrax DNB: The Matrix Has You</title>
 <style>
-  .image-container {
-    position: cover;
-    width: 1980px; /* Adjust as needed */
-    margin: auto; /* Center the div on the page */
-    overflow: hidden; /* Keep the overflow content from expanding outside */
+
+
+
+
+  html, body {
+    color: #ffffff;
+    background-color: #000000;
+    padding: 0px;
+    margin: 0px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    user-select: none;
+    width: 100vw; /* Adjust as needed */
+    height: 100vh;
   }
 
+  .image-container {
+    position: absolute;
+    margin: auto; /* Center the div on the page */
+    /*overflow: hidden;  Keep the overflow content from expanding outside */
+    text-align: center;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+  }
+
+
   #zoomable-image {
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100vh;
+    position: absolute;
+    display: block;
+    left: 50%; 
+    transform: translateX(-50%);
     transition: transform 2s ease-out, transform-origin 0.5s ease-out; /* Smooth transition for zoom and re-positioning */
     cursor: pointer; /* Indicates a clickable item */
     transform-origin: 50% 50%; /* Adjust this to the center of the screen in the image */
   }
 
+  @media (orientation: portrait) {
+
+      #zoomable-image {
+        width: auto;
+        height: 100vh;
+        position: absolute;
+        display: block;
+        left: 50vw; 
+        transform: translateX(-60%);
+        transition: transform 2s ease-out, transform-origin 0.5s ease-out; /* Smooth transition for zoom and re-positioning */
+        cursor: pointer; /* Indicates a clickable item */
+        transform-origin: 50% 50%; /* Adjust this to the center of the screen in the image */
+      }
+  }
+
   /* This class will be added via JavaScript on click */
   .zoomed {
-    transform: scale(2); /* Adjust scale as desired for zoom level */
-    transform-origin: x937 y367 ; /* Replace with the percentage values for the screen's center */
+    transform: translateX(-60%) scale(4)!important; /* Adjust scale as desired for zoom level */
+    transform-origin: 50% 50%!important; ; /* Replace with the percentage values for the screen's center */
   }
 </style>
 </head>
 <body>
 
 <div class="image-container">
-  <img src="/img/console.jpg" alt="Zoomable Image" id="zoomable-image">
+    <img src="/img/console_max.jpg" alt="Zoomable Image" id="zoomable-image">
 </div>
 
 <script>
@@ -44,7 +86,7 @@
       // Redirect after a delay to allow the animation to be seen
       setTimeout(function() {
         window.location.href = '/terminal.html'; // Updated URL
-      }, 2000); // Redirect after 2 seconds (2000 milliseconds)
+      }, 1000); // Redirect after 2 seconds (2000 milliseconds)
     }
   });
 </script>
