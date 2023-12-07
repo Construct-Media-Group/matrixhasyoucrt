@@ -1,5 +1,4 @@
 // chat.mjs
-import { clear, parse } from "../../util/screens.js";
 import { prompt, type } from "../../util/io.js";
 
 const API_URL = 'https://oracle.thematrixhasyou.tech/chat';
