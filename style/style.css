@@ -139,7 +139,7 @@ a {
 /*********** PARTS OF THE SCREEN *************/
 
 #monitor {
-	margin: 3vmin auto;
+	margin: 0px auto;
 	padding: 5.5vmin;
 	width: min-content;
 	display: flex;
