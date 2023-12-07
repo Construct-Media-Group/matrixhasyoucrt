@@ -23,9 +23,16 @@ export default async function chat() {
     // Parse the JSON response body
 
     const responseData = await response.json();
-
-    // Extract the 'message' field from the JSON response
-    const assistantResponse = JSON.stringify(responseData.message);
+const assistantResponse = JSON.stringify(responseData.message)
+  .replace(/\\n/g, ' ')
+  .replace(/\n/g, ' ')
+  .replace(/\\'/g, "'")
+  .replace(/\\"/g, '"')
+  .replace(/\\&/g, '&')
+  .replace(/\\r/g, '\r')
+  .replace(/\\t/g, '\t')
+  .replace(/\\b/g, '\b')
+  .replace(/\\f/g, '\f');
 
     console.log(`Oracle: ${assistantResponse}`);
     await type(`Assistant: ${assistantResponse}`);  

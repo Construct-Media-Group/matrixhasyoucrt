@@ -55,8 +55,81 @@
 			</defs>
 		</svg>
 	</head>
+	<style>
+		.dropbtn {
+		  background-color: #9d9e9e;
+		  color: white;
+		  padding: 16px;
+		  font-size: 3vh;
+		  border: none;
+		  cursor: pointer;
+		}
+		
+		.dropbtn:hover, .dropbtn:focus {
+		  background-color: #757575;
+		}
+		
+		.dropdown {
+		  float: right;
+		  position: relative;
+		  display: inline-block;
+		}
+		
+		.dropdown-content {
+		  display: none;
+		  position: absolute;
+		  background-color: rgba(41, 117, 51, 0.507), 10, 10);
+		  min-width: 160px;
+		  overflow: auto;
+		  font-size: 1.4vh;
+		  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		  right: 0;
+		  z-index: 1;
+		}
+		
+		.dropdown-content a {
+		  color: black;
+		  padding: 12px 16px;
+		  text-decoration: none;
+		  display: block;
+		}
+		
+		.dropdown a:hover {background-color: #ddd;}
+		
+		.show {display: block;}
+		</style>
 
 	<body class="theme-green">
+		<div class="dropdown">
+		  <button onclick="myFunction()" class="dropbtn">☰</button>
+		  <div id="myDropdown" class="dropdown-content">
+			<a href="https://www.thematrixhasyou.tech">Exit Computer</a>
+			<a href="https://www.constructsound.com">Construct Sound</a>
+			<a href="https://www.constructsound.com/artist/btraxdnb/">Btrax DnB</a>
+		  </div>
+		</div>
+		
+		<script>
+		/* When the user clicks on the button, 
+		toggle between hiding and showing the dropdown content */
+		function myFunction() {
+		  document.getElementById("myDropdown").classList.toggle("show");
+		}
+		
+		// Close the dropdown if the user clicks outside of it
+		window.onclick = function(event) {
+		  if (!event.target.matches('.dropbtn')) {
+			var dropdowns = document.getElementsByClassName("dropdown-content");
+			var i;
+			for (i = 0; i < dropdowns.length; i++) {
+			  var openDropdown = dropdowns[i];
+			  if (openDropdown.classList.contains('show')) {
+				openDropdown.classList.remove('show');
+			  }
+			}
+		  }
+		}
+		</script>
 		<div id="monitor" class="off">
 			<div id="screen">
 				<div id="crt">
@@ -128,6 +201,8 @@
 				</div>
 			</div>
 		</div>
+
+
 
 		<script src="./terminal.mjs" type="module"></script>
 	</body>
