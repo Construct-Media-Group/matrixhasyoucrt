@@ -134,6 +134,7 @@ async function type(
 	options = {},
 	container = document.querySelector(".terminal")
 ) {
+	console.debug(text);
 	if (!text) return Promise.resolve();
 
 	let {
@@ -141,7 +142,7 @@ async function type(
 		initialWait = 1000,
 		finalWait = 500,
 		lineWait = 100,
-		typerClass = "",
+		typerClass = "typer",
 		useContainer = false,
 		stopBlinking = true,
 		processChars = true,
