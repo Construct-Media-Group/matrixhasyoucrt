@@ -1,8 +1,11 @@
 // chat.mjs
-import { clear } from "../../util/screens.js";
+import { clear, parse } from "../../util/screens.js";
 import { prompt, type } from "../../util/io.js";
 
 const API_URL = 'https://oracle.thematrixhasyou.tech/chat';
+
+// Define a list of available commands
+const availableCommands = ['logout', 'help', 'joke', /* other commands */];
 
 export default async function chat() {
   while(true) {
