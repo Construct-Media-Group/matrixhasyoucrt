@@ -536,7 +536,7 @@
  /*********** MEDIA QUERIES *************/
  
  /* For really small screens, only show fullscreen mode */
- @media only screen and (max-width: 950px), (max-height: 850px) {
+ @media only screen and (max-width: 950px), (max-height: 650px) {
 	#crt {
 		position: fixed;
 		left: 0;
